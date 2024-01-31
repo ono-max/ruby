@@ -842,7 +842,7 @@ module Test
         end
       end
 
-      def record(suite, method, assertions, time, error)
+      def record(suite, method, assertions, time, error, source_location = nil)
         if @options.values_at(:longest, :most_asserted).any?
           @tops ||= {}
           rec = [suite.name, method, assertions, time, error]
@@ -855,8 +855,7 @@ module Test
         end
         # (((@record ||= {})[suite] ||= {})[method]) = [assertions, time, error]
         if writer = @options[:launchable_test_reports]
-          location = suite.instance_method(method).source_location
-          if location && path = location.first
+          if path = (source_location || suite.instance_method(method).source_location).first
             # Launchable JSON schema is defined at
             # https://github.com/search?q=repo%3Alaunchableinc%2Fcli+https%3A%2F%2Flaunchableinc.com%2Fschema%2FRecordTestInput&type=code.
             e = case error
@@ -865,28 +864,39 @@ module Test
                   nil
                 when Test::Unit::PendedError
                   status = 'TEST_SKIPPED'
-                  "Skipped:\n#{klass}##{meth} [#{location e}]:\n#{e.message}\n"
+                  "Skipped:\n#{suite.name}##{method} [#{location error}]:\n#{error.message}\n"
                 when Test::Unit::AssertionFailedError
                   status = 'TEST_FAILED'
-                  "Failure:\n#{klass}##{meth} [#{location e}]:\n#{e.message}\n"
+                  "Failure:\n#{suite.name}##{method} [#{location error}]:\n#{error.message}\n"
                 when Timeout::Error
                   status = 'TEST_FAILED'
-                  "Timeout:\n#{klass}##{meth}\n"
+                  "Timeout:\n#{suite.name}##{method}\n"
                 else
                   status = 'TEST_FAILED'
-                  bt = Test::filter_backtrace(e.backtrace).join "\n    "
-                  "Error:\n#{klass}##{meth}:\n#{e.class}: #{e.message.b}\n    #{bt}\n"
+                  bt = Test::filter_backtrace(error.backtrace).join "\n    "
+                  "Error:\n#{suite.name}##{method}:\n#{error.class}: #{error.message.b}\n    #{bt}\n"
                 end
-            writer.write_object do
-              writer.write_key_value('testPath', "file=#{path}#class=#{suite.name}#testcase=#{method}",)
-              writer.write_key_value('status', status)
-              writer.write_key_value('duration', time)
-              writer.write_key_value('createdAt', Time.now)
-              writer.write_key_value('stderr', e) if e
-            end
+            repo_path = File.expand_path("#{__dir__}/../../../")
+            relative_path = path.delete_prefix("#{repo_path}/")
+            # The test path is a URL-encoded representation.
+            # https://github.com/launchableinc/cli/blob/v1.81.0/launchable/testpath.py#L18
+            test_path = URI.encode_www_form({file: relative_path, class: suite.name, testcase: method})
           end
         end
         super
+      ensure
+        if writer && test_path && status
+          # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
+          # In such cases, we proceed to execute the operation here.
+          writer.write_object do
+            writer.write_key_value('testPath', test_path)
+            writer.write_key_value('status', status)
+            writer.write_key_value('duration', time)
+            writer.write_key_value('createdAt', Time.now.to_s)
+            writer.write_key_value('stderr', e)
+            writer.write_key_value('stdout', nil)
+          end
+        end
       end
 
       def run(*args)
@@ -915,10 +925,20 @@ module Test
           options[:most_asserted] = n
         end
         opts.on '--launchable-test-reports=PATH', String, 'Report test results in Launchable JSON format' do |path|
-          require 'json'
-          options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
-          writer.write_array('testCases')
-          at_exit{ writer.close }
+          if Test::Unit::AutoRunner::Runner === self
+            require 'json'
+            require 'uri'
+            options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
+            writer.write_array('testCases')
+            at_exit {
+              # This block is executed when the fork block in a test is completed.
+              # Therefore, we need to verify whether all tests have been completed.
+              stack = caller
+              if stack && stack.size == 0
+                writer.close
+              end
+            }
+          end
         end
       end
       ##
@@ -979,10 +999,13 @@ module Test
         end
 
         def close
+          return if @file.closed?
           close_array
           @indent_level -= 1
           write_new_line
           @file.write("}")
+          @file.flush
+          @file.close
         end
 
         private
@@ -1720,13 +1743,13 @@ module Test
       # failure or error in teardown, it will be sent again with the
       # error or failure.
 
-      def record suite, method, assertions, time, error
+      def record suite, method, assertions, time, error, source_location = nil
       end
 
       def location e # :nodoc:
         last_before_assertion = ""
 
-        return '<empty>' unless e.backtrace # SystemStackError can return nil.
+        return '<empty>' unless e&.backtrace # SystemStackError can return nil.
 
         e.backtrace.reverse_each do |s|
           break if s =~ /in .(assert|refute|flunk|pass|fail|raise|must|wont)/
