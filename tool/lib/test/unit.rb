@@ -1002,6 +1002,7 @@ module Test
           @file.flush
           @file.close
           $stderr.puts "close_finish"
+          $stderr.puts @file.closed?
         end
 
         private
