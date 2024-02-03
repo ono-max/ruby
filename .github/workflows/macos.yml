@@ -30,7 +30,6 @@ env:
   LAUNCHABLE_WORKSPACE: "ruby"
   # https://github.com/launchableinc/cli/blob/v1.80.1/launchable/utils/authentication.py#L71
   GITHUB_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-  LANCHABLE_REPORT_FILE_NAME: $(echo $RANDOM)
 
 concurrency:
   group: ${{ github.workflow }} / ${{ startsWith(github.event_name, 'pull') && github.ref_name || github.sha }}
@@ -112,52 +111,37 @@ jobs:
           : # To avoid file name conflicts, we use a random number here as a ID.
           random_number=$RANDOM
           echo "random_number=$random_number" >> $GITHUB_OUTPUT
+          echo "TEST_WITH_LAUNCHABLE=--launchable-test-reports=$random_number.json" >> "$GITHUB_ENV"
         if: ${{ github.repository == 'ruby/ruby' && (matrix.test_task == 'check' || matrix.test_task == 'test-all') }}
 
-      # Set environment variable TESTS for make ${{ matrix.test_task }}
-      - name: Set skipped tests to TESTS for make ${{ matrix.test_task }}
-        run: echo "${TESTS:+TESTS=`echo \"$TESTS\" | sed 's| |$$/ -n!/|g;s|^|-n!/|;s|$|$$/|'`}" >> "$GITHUB_ENV"
-        env:
-          TESTS: "${{ matrix.test_task == 'check' && matrix.skipped_tests || '' }}"
-      - name: Set repeat-count option to TESTS for make ${{ matrix.test_task }}
-        run: echo "TESTS=--repeat-count=2" >> "$GITHUB_ENV"
-        if: ${{ startsWith(  matrix.test_task , 'test-all' ) }}
-      - name: Set launchable-test-reports to TESTS for make ${{ matrix.test_task }}
-        run: echo "TESTS=$TESTS --launchable-test-reports=$LANCHABLE_REPORT_FILE_NAME.json" >> $GITHUB_ENV
-        if: ${{ github.repository == 'ruby/ruby' && (matrix.test_task == 'check' || matrix.test_task == 'test-all') }}
+      - name: Set repeat-count option for make ${{ matrix.test_task }}
+        run: echo "TEST_WITH_LAUNCHABLE=$TEST_WITH_LAUNCHABLE --repeat-count=2" >> "$GITHUB_ENV"
+        if: ${{ matrix.test_task == 'test-all' }}
 
       - name: make ${{ matrix.test_task }}
         run: |
-          make -s ${{ matrix.test_task }} TESTS="$TESTS"
-          echo "TESTS=''" >> "$GITHUB_ENV"
+          make -s ${{ matrix.test_task }} TESTS="$TEST_WITH_LAUNCHABLE" ${TESTS:+TESTS=`echo "$TESTS" | sed 's| |$$/ -n!/|g;s|^|-n!/|;s|$|$$/|'`}
         timeout-minutes: 60
         env:
           RUBY_TESTOPTS: '-q --tty=no'
+          TESTS: ${{ matrix.test_task == 'check' && matrix.skipped_tests || '' }}
           TEST_BUNDLED_GEMS_ALLOW_FAILURES: 'typeprof'
           PRECHECK_BUNDLED_GEMS: 'no'
 
-      - name: Set skipped tests to TESTS for make skipped tests
-        run: echo "TESTS=`echo \"$TESTS\" | sed 's| |$$/ -n/|g;s|^|-n/|;s|$|$$/|'`" >> "$GITHUB_ENV"
-        env:
-          TESTS: ${{ matrix.skipped_tests }}
-      - name: Set launchable-test-reports to TESTS for make skipped tests
-        run: echo "TESTS=$TESTS --launchable-test-reports=$LANCHABLE_REPORT_FILE_NAME.json" >> $GITHUB_ENV
-        if: ${{ github.repository == 'ruby/ruby' && (matrix.test_task == 'check' || matrix.test_task == 'test-all') }}
-
       - name: make skipped tests
         run: |
-          make -s test-all TESTS="$TESTS"
-          echo "TESTS=''" >> "$GITHUB_ENV"
+          make -s test-all TESTS=`echo "$TESTS" | sed 's| |$$/ -n/|g;s|^|-n/|;s|$|$$/|'`
         env:
           GNUMAKEFLAGS: ''
           RUBY_TESTOPTS: '-v --tty=no'
+          TESTS: ${{ matrix.skipped_tests }}
           PRECHECK_BUNDLED_GEMS: 'no'
         if: ${{ matrix.test_task == 'check' && matrix.skipped_tests != '' }}
         continue-on-error: ${{ matrix.continue-on-skipped_tests || false }}
 
       - name: Launchable - record tests
-        run: launchable record tests --flavor os=${{ matrix.os }} --flavor test_task=${{ matrix.test_task }} raw $LANCHABLE_REPORT_FILE_NAME.json
-        if: ${{ github.repository == 'ruby/ruby' && (matrix.test_task == 'check' || matrix.test_task == 'test-all') }}
+        run: launchable record tests --flavor os=${{ matrix.os }} --flavor test_task=${{ matrix.test_task }} raw ${{ steps.setup_launchable.outputs.random_number }}.json
+        if: ${{ always() && github.repository == 'ruby/ruby' && (matrix.test_task == 'check' || matrix.test_task == 'test-all') }}
 
       - uses: ./.github/actions/slack
         with:
