@@ -930,7 +930,13 @@ module Test
             require 'uri'
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
             writer.write_array('testCases')
-            at_exit {writer.close}
+            at_exit {
+              stack = caller
+              $stderr.puts stack
+              if stack && stack.size == 0
+                writer.close
+              end
+            }
           end
         end
       end
@@ -993,7 +999,6 @@ module Test
 
         def close
           $stderr.puts "close_start_called"
-          $stderr.puts caller
           $stderr.puts @file.closed?
           return if @file.closed?
           close_array
