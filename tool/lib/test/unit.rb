@@ -993,6 +993,7 @@ module Test
 
         def close
           $stderr.puts "close_start_called"
+          $stderr.puts self
           $stderr.puts @file.closed?
           return if @file.closed?
           close_array
