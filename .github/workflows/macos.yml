@@ -41,8 +41,6 @@ jobs:
         include:
           - test_task: test-all
             os: ${{ github.repository == 'ruby/ruby' && 'macos-arm-oss' || 'macos-13' }}
-          - test_task: test-bundled-gems
-            os: ${{ github.repository == 'ruby/ruby' && 'macos-arm-oss' || 'macos-13' }}
       fail-fast: false
 
     env:
@@ -96,14 +94,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Setup Launchable
-        id: setup_launchable
         run: |
           pip install launchable
           launchable verify
           launchable record build --name ${GITHUB_PR_HEAD_SHA}
         if: ${{ github.repository == 'ruby/ruby' && (matrix.test_task == 'check' || matrix.test_task == 'test-all') }}
 
-      - run: |
+      - id: setup_launchable
+        run: |
           : # To avoid file name conflicts, we use a random number here as a ID.
           random_number=$RANDOM
           echo "random_number=$random_number" >> $GITHUB_OUTPUT
