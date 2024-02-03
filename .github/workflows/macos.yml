@@ -35,7 +35,7 @@ jobs:
   make:
     strategy:
       matrix:
-        test_task: ['']
+        test_task: ['test-all']
         configure: ['']
         os: ${{ fromJSON(format('["macos-12","macos-13"{0}]', (github.repository == 'ruby/ruby' && ',"macos-arm-oss"' || ''))) }}
         include:
