@@ -121,6 +121,8 @@ jobs:
           TEST_BUNDLED_GEMS_ALLOW_FAILURES: 'typeprof'
           PRECHECK_BUNDLED_GEMS: 'no'
 
+      - run: cat ${{ steps.setup_launchable.outputs.random_number }}.json
+
       - name: make skipped tests
         run: |
           make -s test-all TESTS=`echo "$TESTS" | sed 's| |$$/ -n/|g;s|^|-n/|;s|$|$$/|'`
