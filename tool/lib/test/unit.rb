@@ -992,6 +992,8 @@ module Test
         end
 
         def close
+          $stderr.puts "close_called"
+          $stderr.puts @file.closed?
           return if @file.closed?
           close_array
           @indent_level -= 1
