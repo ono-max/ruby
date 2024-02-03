@@ -992,7 +992,7 @@ module Test
         end
 
         def close
-          $stderr.puts "close_called"
+          $stderr.puts "close_start_called"
           $stderr.puts @file.closed?
           return if @file.closed?
           close_array
@@ -1001,6 +1001,7 @@ module Test
           @file.write("}")
           @file.flush
           @file.close
+          $stderr.puts "close_finish"
         end
 
         private
