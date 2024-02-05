@@ -1846,6 +1846,7 @@ module Test
       prepend Test::Unit::ExcludesOption
       prepend Test::Unit::TimeoutOption
       prepend Test::Unit::RunCount
+      prepend Test::Unit::LaunchableOption
 
       ##
       # Begins the full test run. Delegates to +runner+'s #_run method.
@@ -1902,7 +1903,6 @@ module Test
     class AutoRunner # :nodoc: all
       class Runner < Test::Unit::Runner
         include Test::Unit::RequireFiles
-        include Test::Unit::LaunchableOption
       end
 
       attr_accessor :to_run, :options
