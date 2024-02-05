@@ -1409,13 +1409,16 @@ module Test
             require 'uri'
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
             writer.write_array('testCases')
+            $stderr.puts "main_process"
+            $stderr.puts Process.pid
             at_exit {
               # This block is executed when the fork block in a test is completed.
               # Therefore, we need to verify whether all tests have been completed.
               stack = caller
               if stack && stack.size == 0
-                $stderr.puts "hjogeho: #{stack && stack.size}"
-                $stderr.puts stack
+                $stderr.puts "hogehoge"
+                $stderr.puts $!
+                $stderr.puts Process.pid
                 writer.close
               end
             }
