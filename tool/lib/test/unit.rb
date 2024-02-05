@@ -1409,11 +1409,12 @@ module Test
             require 'uri'
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
             writer.write_array('testCases')
+            main_pid = Process.pid
             at_exit {
               # This block is executed when the fork block in a test is completed.
               # Therefore, we need to verify whether all tests have been completed.
               stack = caller
-              if stack && stack.size == 0
+              if stack.size == 0 && main_pid == Process.pid
                 writer.close
               end
             }
