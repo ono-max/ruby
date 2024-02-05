@@ -1413,6 +1413,8 @@ module Test
               # This block is executed when the fork block in a test is completed.
               # Therefore, we need to verify whether all tests have been completed.
               stack = caller
+              $stderr.puts "hjogeho"
+              $stderr.puts stack
               if stack && stack.size == 0
                 writer.close
               end
