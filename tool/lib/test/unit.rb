@@ -1388,8 +1388,8 @@ module Test
       ensure
         if writer && test_path && status
           if @launchable_pid != Process.pid
-            $stderr.puts "pid: #{@launchable_pid}"
             @launchable_pid = Process.pid
+            $stderr.puts "pid: #{@launchable_pid}"
           end
           # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
           # In such cases, we proceed to execute the operation here.
