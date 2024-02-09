@@ -123,6 +123,11 @@ jobs:
 
       - run: cat ${{ steps.setup_launchable.outputs.random_number }}.json
 
+      - name: json-syntax-check
+        uses: limitusus/json-syntax-check@v2
+        with:
+          pattern: "\\.json$"
+
       - name: make skipped tests
         run: |
           make -s test-all TESTS=`echo "$TESTS" | sed 's| |$$/ -n/|g;s|^|-n/|;s|$|$$/|'`
