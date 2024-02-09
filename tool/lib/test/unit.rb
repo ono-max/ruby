@@ -1414,7 +1414,12 @@ module Test
               # This block is executed when the fork block in a test is completed.
               # Therefore, we need to verify whether all tests have been completed.
               stack = caller
-              if stack.size == 0 && main_pid == Process.pid
+              if stack.size == 0 && main_pid == Process.pid && $!.is_a?(SystemExit)
+                $stderr.puts "debug"
+                $stderr.puts stack.size
+                $stderr.puts main_pid
+                $stderr.puts Process.pid
+                $stderr.puts $!
                 writer.close
               end
             }
