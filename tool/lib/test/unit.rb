@@ -1356,6 +1356,7 @@ module Test
     module LaunchableOption
       def record(suite, method, assertions, time, error, source_location = nil)
         if writer = @options[:launchable_test_reports]
+          $stderr.puts Process.pid
           if path = (source_location || suite.instance_method(method).source_location).first
             # Launchable JSON schema is defined at
             # https://github.com/search?q=repo%3Alaunchableinc%2Fcli+https%3A%2F%2Flaunchableinc.com%2Fschema%2FRecordTestInput&type=code.
@@ -1415,11 +1416,6 @@ module Test
               # Therefore, we need to verify whether all tests have been completed.
               stack = caller
               if stack.size == 0 && main_pid == Process.pid && $!.is_a?(SystemExit)
-                $stderr.puts "debug"
-                $stderr.puts stack.size
-                $stderr.puts main_pid
-                $stderr.puts Process.pid
-                $stderr.puts $!
                 writer.close
               end
             }
