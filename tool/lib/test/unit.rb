@@ -1356,7 +1356,6 @@ module Test
     module LaunchableOption
       def record(suite, method, assertions, time, error, source_location = nil)
         if writer = @options[:launchable_test_reports]
-          $stderr.puts Process.pid
           if path = (source_location || suite.instance_method(method).source_location).first
             # Launchable JSON schema is defined at
             # https://github.com/search?q=repo%3Alaunchableinc%2Fcli+https%3A%2F%2Flaunchableinc.com%2Fschema%2FRecordTestInput&type=code.
@@ -1388,6 +1387,10 @@ module Test
         super
       ensure
         if writer && test_path && status
+          if @launchable_pid != Process.pid
+            $stderr.puts "pid: #{@launchable_pid}"
+            @launchable_pid = Process.pid
+          end
           # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
           # In such cases, we proceed to execute the operation here.
           writer.write_object do
@@ -1408,6 +1411,7 @@ module Test
           if Test::Unit::AutoRunner::Runner === self
             require 'json'
             require 'uri'
+            @launchable_pid=nil
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
             writer.write_array('testCases')
             main_pid = Process.pid
