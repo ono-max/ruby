@@ -123,10 +123,7 @@ jobs:
 
       - run: cat ${{ steps.setup_launchable.outputs.random_number }}.json
 
-      - name: json-syntax-check
-        uses: limitusus/json-syntax-check@v2
-        with:
-          pattern: "\\.json$"
+      - run: python -c "import json; f = open('${{ steps.setup_launchable.outputs.random_number }}.json', 'r'); json_dict = json.load(f)"
 
       - name: make skipped tests
         run: |
