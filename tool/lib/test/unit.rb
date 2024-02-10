@@ -1391,6 +1391,10 @@ module Test
             @launchable_pid = Process.pid
             $stderr.puts "pid: #{@launchable_pid}"
           end
+          if @launchable_class !== self
+            @launchable_class = self
+            $stderr.puts "self: #{@launchable_class}"
+          end
           # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
           # In such cases, we proceed to execute the operation here.
           writer.write_object do
@@ -1412,6 +1416,9 @@ module Test
             require 'json'
             require 'uri'
             @launchable_pid=nil
+            @launchable_class=nil
+            $stderr.puts "main_pid: #{Process.pid}"
+            $stderr.puts "main_self: #{self}"
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
             writer.write_array('testCases')
             main_pid = Process.pid
