@@ -1391,7 +1391,7 @@ module Test
             @launchable_pid = Process.pid
             $stderr.puts "pid: #{@launchable_pid}"
           end
-          if @launchable_class !== self
+          if !(@launchable_class === self)
             @launchable_class = self
             $stderr.puts "self: #{@launchable_class}"
           end
