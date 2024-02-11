@@ -1382,30 +1382,29 @@ module Test
             # The test path is a URL-encoded representation.
             # https://github.com/launchableinc/cli/blob/v1.81.0/launchable/testpath.py#L18
             test_path = URI.encode_www_form({file: relative_path, class: suite.name, testcase: method})
+            if writer && test_path && status
+              if @launchable_pid != Process.pid
+                @launchable_pid = Process.pid
+                $stderr.puts "pid: #{@launchable_pid}"
+              end
+              if !(@launchable_class === self)
+                @launchable_class = self
+                $stderr.puts "self: #{@launchable_class}"
+              end
+              # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
+              # In such cases, we proceed to execute the operation here.
+              writer.write_object do
+                writer.write_key_value('testPath', test_path)
+                writer.write_key_value('status', status)
+                writer.write_key_value('duration', time)
+                writer.write_key_value('createdAt', Time.now.to_s)
+                writer.write_key_value('stderr', e)
+                writer.write_key_value('stdout', nil)
+              end
+            end
           end
         end
         super
-      ensure
-        if writer && test_path && status
-          if @launchable_pid != Process.pid
-            @launchable_pid = Process.pid
-            $stderr.puts "pid: #{@launchable_pid}"
-          end
-          if !(@launchable_class === self)
-            @launchable_class = self
-            $stderr.puts "self: #{@launchable_class}"
-          end
-          # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
-          # In such cases, we proceed to execute the operation here.
-          writer.write_object do
-            writer.write_key_value('testPath', test_path)
-            writer.write_key_value('status', status)
-            writer.write_key_value('duration', time)
-            writer.write_key_value('createdAt', Time.now.to_s)
-            writer.write_key_value('stderr', e)
-            writer.write_key_value('stdout', nil)
-          end
-        end
       end
 
       private
