@@ -1405,6 +1405,7 @@ module Test
                 writer.write_key_value('stderr', e)
                 writer.write_key_value('stdout', nil)
               end
+              $stderr.puts File.read(@launchable_path)
             end
           end
         end
@@ -1421,6 +1422,7 @@ module Test
             @launchable_pid=nil
             @launchable_class=nil
             @launchable_thread=nil
+            @launchable_path=path
             $stderr.puts "main_pid: #{Process.pid}"
             $stderr.puts "main_self: #{self}"
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
