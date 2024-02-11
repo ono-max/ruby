@@ -1405,11 +1405,13 @@ module Test
                 writer.write_key_value('stderr', e)
                 writer.write_key_value('stdout', nil)
               end
-              $stderr.puts File.read(@launchable_path)
             end
           end
         end
         super
+      rescue Exception => e
+        $stderr.puts "error: #{e}"
+        raise
       end
 
       private
