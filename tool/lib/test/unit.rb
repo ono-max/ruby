@@ -1391,6 +1391,10 @@ module Test
                 @launchable_class = self
                 $stderr.puts "self: #{@launchable_class}"
               end
+              if @launchable_thread != Thread.current
+                @launchable_thread = Thread.current
+                $stderr.puts "thread: #{@launchable_thread}"
+              end
               # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
               # In such cases, we proceed to execute the operation here.
               writer.write_object do
@@ -1416,6 +1420,7 @@ module Test
             require 'uri'
             @launchable_pid=nil
             @launchable_class=nil
+            @launchable_thread=nil
             $stderr.puts "main_pid: #{Process.pid}"
             $stderr.puts "main_self: #{self}"
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
