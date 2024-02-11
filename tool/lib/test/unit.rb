@@ -1410,7 +1410,7 @@ module Test
         end
         super
       rescue Exception => e
-        $stderr.puts "error: #{e}"
+        $stderr.puts "hogeerror: #{e}"
         raise
       end
 
