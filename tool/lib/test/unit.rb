@@ -1395,10 +1395,10 @@ module Test
                 @launchable_thread = Thread.current
                 $stderr.puts "thread: #{@launchable_thread}"
               end
-              $stderr.puts "pid: #{Process.pid} test_path: #{test_path}"
               # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
               # In such cases, we proceed to execute the operation here.
               writer.write_object do
+                $stderr.puts "pid: #{Process.pid} test_path: #{test_path}"
                 writer.write_key_value('testPath', test_path)
                 writer.write_key_value('status', status)
                 writer.write_key_value('duration', time)
@@ -1453,13 +1453,10 @@ module Test
           @indent_level = 0
           @is_first_key_val = true
           @is_first_obj = true
-          @path = path
           write_new_line
         end
 
         def write_object
-          @file = File.open(@path, "w")
-          @file.flock(File::LOCK_EX)
           if @is_first_obj
             @is_first_obj = false
           else
@@ -1478,7 +1475,6 @@ module Test
           @file.write("}")
           @indent_level -= 1
           @is_first_key_val = true
-          @file.flock(File::LOCK_UN)
         end
 
         def write_array(key)
