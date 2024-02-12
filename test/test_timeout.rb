@@ -243,29 +243,29 @@ class TestTimeout < Test::Unit::TestCase
 #     r.close
 #   end
 
-#   def test_threadgroup
-#     assert_separately(%w[-rtimeout], <<-'end;')
-#       tg = ThreadGroup.new
-#       thr = Thread.new do
-#         tg.add(Thread.current)
-#         Timeout.timeout(10){}
-#       end
-#       thr.join
-#       assert_equal [].to_s, tg.list.to_s
-#     end;
-#   end
-
-  # https://github.com/ruby/timeout/issues/24
-  def test_handling_enclosed_threadgroup
+  def test_threadgroup
     assert_separately(%w[-rtimeout], <<-'end;')
-      Thread.new {
-        t = Thread.current
-        group = ThreadGroup.new
-        group.add(t)
-        group.enclose
-
-        assert_equal 42, Timeout.timeout(1) { 42 }
-      }.join
+      tg = ThreadGroup.new
+      thr = Thread.new do
+        tg.add(Thread.current)
+        Timeout.timeout(10){}
+      end
+      thr.join
+      assert_equal [].to_s, tg.list.to_s
     end;
   end
+
+  # # https://github.com/ruby/timeout/issues/24
+  # def test_handling_enclosed_threadgroup
+  #   assert_separately(%w[-rtimeout], <<-'end;')
+  #     Thread.new {
+  #       t = Thread.current
+  #       group = ThreadGroup.new
+  #       group.add(t)
+  #       group.enclose
+
+  #       assert_equal 42, Timeout.timeout(1) { 42 }
+  #     }.join
+  #   end;
+  # end
 end
