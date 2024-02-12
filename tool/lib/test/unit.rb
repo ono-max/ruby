@@ -1395,7 +1395,7 @@ module Test
                 @launchable_thread = Thread.current
                 $stderr.puts "thread: #{@launchable_thread}"
               end
-              $stderr.puts test_path
+              $stderr.puts "pid: #{Process.pid} test_path: #{test_path}"
               # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
               # In such cases, we proceed to execute the operation here.
               writer.write_object do
