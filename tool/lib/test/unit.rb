@@ -1453,10 +1453,13 @@ module Test
           @indent_level = 0
           @is_first_key_val = true
           @is_first_obj = true
+          @path = path
           write_new_line
         end
 
         def write_object
+          @file = File.open(@path, "w")
+          @file.flock(File::LOCK_EX)
           if @is_first_obj
             @is_first_obj = false
           else
@@ -1475,6 +1478,7 @@ module Test
           @file.write("}")
           @indent_level -= 1
           @is_first_key_val = true
+          @file.flock(File::LOCK_UN)
         end
 
         def write_array(key)
