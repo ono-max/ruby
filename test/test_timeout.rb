@@ -4,9 +4,9 @@ require 'test/unit'
 
 class TestTimeout < Test::Unit::TestCase
 
-#   def test_work_is_done_in_same_thread_as_caller
-#     assert_equal Thread.current, Timeout.timeout(10){ Thread.current }
-#   end
+  def test_work_is_done_in_same_thread_as_caller
+    assert_equal Thread.current, Timeout.timeout(10){ Thread.current }
+  end
 
 #   def test_work_is_done_in_same_fiber_as_caller
 #     require 'fiber' # needed for ruby 3.0 and lower
