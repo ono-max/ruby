@@ -1397,15 +1397,20 @@ module Test
               end
               # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
               # In such cases, we proceed to execute the operation here.
-              writer.write_object do
-                $stderr.puts "pid: #{Process.pid} test_path: #{test_path}"
-                writer.write_key_value('testPath', test_path)
-                writer.write_key_value('status', status)
-                writer.write_key_value('duration', time)
-                writer.write_key_value('createdAt', Time.now.to_s)
-                writer.write_key_value('stderr', e)
-                writer.write_key_value('stdout', nil)
+              begin
+                writer.write_object do
+                  writer.write_key_value('testPath', test_path)
+                  writer.write_key_value('status', status)
+                  writer.write_key_value('duration', time)
+                  writer.write_key_value('createdAt', Time.now.to_s)
+                  writer.write_key_value('stderr', e)
+                  writer.write_key_value('stdout', nil)
+                end
+              rescue Exception => e
+                $stderr.puts 'hogehoge'
+                $stderr.puts e
               end
+              $stderr.puts File.read(@launchable_path)
             end
           end
         end
