@@ -1410,7 +1410,11 @@ module Test
                 $stderr.puts 'hogehoge'
                 $stderr.puts e
               end
-              $stderr.puts File.read(@launchable_path)
+              @launchable_count += 1
+              if @launchable_count > 49000
+                $stderr.puts test_path
+                $stderr.puts File.read(@launchable_path)
+              end
             end
           end
         end
@@ -1431,6 +1435,7 @@ module Test
             @launchable_class=nil
             @launchable_thread=nil
             @launchable_path=path
+            @launchable_count = 0
             $stderr.puts "main_pid: #{Process.pid}"
             $stderr.puts "main_self: #{self}"
             options[:launchable_test_reports] = writer = JsonStreamWriter.new(path)
