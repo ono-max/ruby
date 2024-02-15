@@ -1411,7 +1411,7 @@ module Test
                 $stderr.puts e
               end
               @launchable_count += 1
-              if @launchable_count > 49000
+              if suite.name=='TestTimeExtension'
                 $stderr.puts test_path
                 $stderr.puts File.read(@launchable_path)
               end
