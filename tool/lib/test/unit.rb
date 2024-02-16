@@ -1396,7 +1396,7 @@ module Test
                 $stderr.puts "thread: #{@launchable_thread}"
               end
               # Occasionally, the file writing operation may be paused, especially when `--repeat-count` is specified.
-              # In such cases, we proceed to execute the operation here.
+              # In such cases, we proceed to execute the operation here
               begin
                 writer.write_object do
                   writer.write_key_value('testPath', test_path)
