@@ -1485,6 +1485,7 @@ module Test
           @file.write("}")
           @indent_level -= 1
           @is_first_key_val = true
+          @file.flush
         end
 
         def write_array(key)
