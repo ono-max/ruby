@@ -137,6 +137,8 @@ jobs:
         if: ${{ matrix.test_task == 'check' && matrix.skipped_tests }}
         continue-on-error: ${{ matrix.continue-on-skipped_tests || false }}
 
+      - run : pwd
+
       - name: Record test results in Launchable
         uses: ./.github/actions/setup/launchable/record-test
         with:

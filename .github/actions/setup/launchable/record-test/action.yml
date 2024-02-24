@@ -16,4 +16,6 @@ runs:
   steps:
     - name: Launchable - record tests
       shell: bash
-      run: launchable record tests --flavor os=${{ matrix.os }} --flavor test_task=${{ matrix.test_task }} raw launchable_reports.json
+      run: |
+        pwd
+        cat launchable_reports.json
