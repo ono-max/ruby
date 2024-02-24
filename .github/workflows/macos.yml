@@ -143,7 +143,6 @@ jobs:
         uses: ./.github/actions/setup/launchable/record-test
         with:
           os: ${{ matrix.os }}
-        if: ${{ always() && steps.enable_launchable.outputs.enable_launchable }}
 
       - uses: ./.github/actions/slack
         with:
