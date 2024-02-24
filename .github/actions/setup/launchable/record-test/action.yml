@@ -18,4 +18,4 @@ runs:
       shell: bash
       run: |
         pwd
-        cat launchable_reports.json
+        echo ${{ github.workspace }}
