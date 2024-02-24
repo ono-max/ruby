@@ -1,0 +1,19 @@
+name: Record tests in Launchable
+description: >-
+  Upload the test results to Launchable
+
+inputs:
+  os:
+    required: true
+    description: >-
+      An operating system that CI runs on. This value is used in Launchable flavor.
+
+outputs: {} # nothing?
+
+runs:
+  using: composite
+
+  steps:
+    - name: Launchable - record tests
+      shell: bash
+      run: launchable record tests --flavor os=${{ matrix.os }} --flavor test_task=${{ matrix.test_task }} raw launchable_reports.json
