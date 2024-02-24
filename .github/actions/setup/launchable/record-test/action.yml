@@ -8,6 +8,13 @@ inputs:
     description: >-
       An operating system that CI runs on. This value is used in Launchable flavor.
 
+  builddir:
+    required: false
+    default: ${{ github.workspace }}
+    description: >-
+      Where binaries and other generated contents go.  This will be
+      created if absent.
+
 outputs: {} # nothing?
 
 runs:
@@ -16,6 +23,7 @@ runs:
   steps:
     - name: Launchable - record tests
       shell: bash
+      working-directory: ${{ inputs.builddir }}
       run: |
         pwd
         echo ${{ github.workspace }}
