@@ -2,12 +2,12 @@ name: Windows
 on:
   push:
     paths-ignore:
-      - 'doc/**'
-      - '**/man/*'
-      - '**.md'
-      - '**.rdoc'
-      - '**/.document'
-      - '.*.yml'
+      - "doc/**"
+      - "**/man/*"
+      - "**.md"
+      - "**.rdoc"
+      - "**/.document"
+      - ".*.yml"
   pull_request:
     # Do not use paths-ignore for required status checks
     # https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks#handling-skipped-but-required-checks
@@ -27,7 +27,7 @@ jobs:
         include:
           - vc: 2015
             vs: 2019
-            vcvars: '10.0.14393.0 -vcvars_ver=14.0' # The oldest Windows 10 SDK w/ VC++ 2015 toolset (v140)
+            vcvars: "10.0.14393.0 -vcvars_ver=14.0" # The oldest Windows 10 SDK w/ VC++ 2015 toolset (v140)
             test_task: check
           - vs: 2019
             test_task: check
@@ -90,7 +90,7 @@ jobs:
 
       - uses: ruby/setup-ruby@a6e6f86333f0a2523ece813039b8b4be04560854 # v1.190.0
         with:
-          ruby-version: '3.0'
+          ruby-version: "3.0"
           bundler: none
           windows-toolchain: none
 
@@ -179,8 +179,10 @@ jobs:
         with:
           os: windows-${{ matrix.vs < 2022 && '2019' || matrix.vs }}
           launchable-token: ${{ secrets.LAUNCHABLE_TOKEN }}
+          launchable-url: ${{ secrets.LAUNCHABLE_BASE_URL }}
           builddir: build
           srcdir: src
+          test-task: ${{ matrix.test_task || 'check' }}
         continue-on-error: true
         if: ${{ matrix.test_task != 'test-bundled-gems' }}
 

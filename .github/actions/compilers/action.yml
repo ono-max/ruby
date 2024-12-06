@@ -71,6 +71,18 @@ inputs:
     description: >-
       whitespace separated list of extensions that need be linked statically.
 
+  launchable-token:
+    required: false
+    description: >-
+      Launchable token is needed if you want to run Launchable on your forked repository.
+      See https://github.com/ruby/ruby/wiki/CI-Servers#launchable-ci for details.
+  
+  launchable-url:
+    required: false
+    description: >-
+      Launchable token is needed if you want to run Launchable on your forked repository.
+      See https://github.com/ruby/ruby/wiki/CI-Servers#launchable-ci for details.
+
 runs:
   using: composite
   steps:
@@ -79,7 +91,7 @@ runs:
 
     - name: Enable Launchable conditionally
       id: enable-launchable
-      run: echo "enable-launchable=false" >> $GITHUB_OUTPUT
+      run: echo "enable-launchable=true" >> $GITHUB_OUTPUT
       shell: bash
       if: >-
         ${{
@@ -122,4 +134,6 @@ runs:
         --env GITHUB_EVENT_NAME
         --env GITHUB_SHA
         --env GITHUB_HEAD_REF
+        --env LAUNCHABLE_TOKEN='${{ secrets.LAUNCHABLE_TOKEN }}'
+        --env LAUNCHABLE_BASE_URL='${{ secrets.LAUNCHABLE_BASE_URL }}'
         'ghcr.io/ruby/ruby-ci-image:${{ inputs.tag }}'

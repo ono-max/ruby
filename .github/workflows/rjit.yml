@@ -2,22 +2,22 @@ name: RJIT
 on:
   push:
     paths-ignore:
-      - 'doc/**'
-      - '**.md'
-      - '**.rdoc'
-      - '**/.document'
-      - '**.[1-8]'
-      - '**.ronn'
-      - '.*.yml'
+      - "doc/**"
+      - "**.md"
+      - "**.rdoc"
+      - "**/.document"
+      - "**.[1-8]"
+      - "**.ronn"
+      - ".*.yml"
   pull_request:
     paths-ignore:
-      - 'doc/**'
-      - '**.md'
-      - '**.rdoc'
-      - '**/.document'
-      - '**.[1-8]'
-      - '**.ronn'
-      - '.*.yml'
+      - "doc/**"
+      - "**.md"
+      - "**.rdoc"
+      - "**/.document"
+      - "**.[1-8]"
+      - "**.ronn"
+      - ".*.yml"
   merge_group:
 
 concurrency:
@@ -33,8 +33,8 @@ jobs:
       matrix:
         # main variables included in the job name
         test_task: [check]
-        run_opts: ['--rjit-call-threshold=1']
-        arch: ['']
+        run_opts: ["--rjit-call-threshold=1"]
+        arch: [""]
       fail-fast: false
 
     env:
@@ -83,12 +83,12 @@ jobs:
         uses: ./.github/actions/launchable/setup
         with:
           os: ubuntu-22.04
-          test-task: test
           launchable-token: ${{ secrets.LAUNCHABLE_TOKEN }}
+          launchable-url: ${{ secrets.LAUNCHABLE_BASE_URL }}
           builddir: build
           srcdir: src
-          launchable-workspace: ruby-make-btest
           test-opts: ${{ matrix.run_opts }}
+          test-tasks: '["test", "test-all"]'
         continue-on-error: true
 
       - name: make test
@@ -96,7 +96,7 @@ jobs:
           $SETARCH make -s test RUN_OPTS="$RUN_OPTS"
         timeout-minutes: 30
         env:
-          GNUMAKEFLAGS: ''
+          GNUMAKEFLAGS: ""
           RUBY_TESTOPTS: >-
             ${{ env.TESTS }}
             --tty=no
@@ -107,8 +107,8 @@ jobs:
           $SETARCH make -s test-all RUN_OPTS="$RUN_OPTS"
         timeout-minutes: 60
         env:
-          GNUMAKEFLAGS: ''
-          RUBY_TESTOPTS: '-q --tty=no'
+          GNUMAKEFLAGS: ""
+          RUBY_TESTOPTS: "-q --tty=no"
           RUN_OPTS: ${{ matrix.run_opts }}
 
       - name: make test-spec
@@ -116,7 +116,7 @@ jobs:
           $SETARCH make -s test-spec RUN_OPTS="$RUN_OPTS"
         timeout-minutes: 10
         env:
-          GNUMAKEFLAGS: ''
+          GNUMAKEFLAGS: ""
           RUN_OPTS: ${{ matrix.run_opts }}
 
       - uses: ./.github/actions/slack

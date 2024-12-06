@@ -2,12 +2,12 @@ name: macOS
 on:
   push:
     paths-ignore:
-      - 'doc/**'
-      - '**/man/*'
-      - '**.md'
-      - '**.rdoc'
-      - '**/.document'
-      - '.*.yml'
+      - "doc/**"
+      - "**/man/*"
+      - "**.md"
+      - "**.rdoc"
+      - "**/.document"
+      - ".*.yml"
   pull_request:
     # Do not use paths-ignore for required status checks
     # https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks#handling-skipped-but-required-checks
@@ -29,13 +29,13 @@ jobs:
             os: macos-14
           - test_task: check
             os: macos-14
-            configure_args: '--with-gcc=gcc-14'
+            configure_args: "--with-gcc=gcc-14"
           - test_task: check
             os: macos-14
-            configure_args: '--with-jemalloc --with-opt-dir=$(brew --prefix jemalloc)'
+            configure_args: "--with-jemalloc --with-opt-dir=$(brew --prefix jemalloc)"
           - test_task: check
             os: macos-14
-            configure_args: '--with-gmp'
+            configure_args: "--with-gmp"
           - test_task: test-all
             test_opts: --repeat-count=2
             os: macos-14
@@ -130,6 +130,7 @@ jobs:
           os: ${{ matrix.os }}
           test-opts: ${{ matrix.test_opts }}
           launchable-token: ${{ secrets.LAUNCHABLE_TOKEN }}
+          launchable-url: ${{ secrets.LAUNCHABLE_BASE_URL }}
           builddir: build
           srcdir: src
         continue-on-error: true
@@ -146,17 +147,17 @@ jobs:
           make -s ${{ matrix.test_task }} ${TESTS:+TESTS="$TESTS"}
         timeout-minutes: 60
         env:
-          RUBY_TESTOPTS: '-q --tty=no'
-          TEST_BUNDLED_GEMS_ALLOW_FAILURES: 'typeprof'
-          PRECHECK_BUNDLED_GEMS: 'no'
+          RUBY_TESTOPTS: "-q --tty=no"
+          TEST_BUNDLED_GEMS_ALLOW_FAILURES: "typeprof"
+          PRECHECK_BUNDLED_GEMS: "no"
 
       - name: make skipped tests
         run: |
           make -s test-all TESTS="${TESTS//-n!\//-n/}"
         env:
-          GNUMAKEFLAGS: ''
-          RUBY_TESTOPTS: '-v --tty=no'
-          PRECHECK_BUNDLED_GEMS: 'no'
+          GNUMAKEFLAGS: ""
+          RUBY_TESTOPTS: "-v --tty=no"
+          PRECHECK_BUNDLED_GEMS: "no"
         if: ${{ matrix.test_task == 'check' && matrix.skipped_tests }}
         continue-on-error: ${{ matrix.continue-on-skipped_tests || false }}
 

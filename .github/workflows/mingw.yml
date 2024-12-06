@@ -2,20 +2,20 @@ name: MinGW
 on:
   push:
     paths-ignore:
-      - 'doc/**'
-      - '**/man/*'
-      - '**.md'
-      - '**.rdoc'
-      - '**/.document'
-      - '.*.yml'
+      - "doc/**"
+      - "**/man/*"
+      - "**.md"
+      - "**.rdoc"
+      - "**/.document"
+      - ".*.yml"
   pull_request:
     paths-ignore:
-      - 'doc/**'
-      - '**/man/*'
-      - '**.md'
-      - '**.rdoc'
-      - '**/.document'
-      - '.*.yml'
+      - "doc/**"
+      - "**/man/*"
+      - "**.md"
+      - "**.rdoc"
+      - "**/.document"
+      - ".*.yml"
   merge_group:
 
 concurrency:
@@ -37,11 +37,11 @@ jobs:
     env:
       MSYSTEM: ${{ matrix.msystem }}
       MSYS2_ARCH: x86_64
-      CHOST: 'x86_64-w64-mingw32'
-      CFLAGS: '-march=x86-64 -mtune=generic -O3 -pipe'
-      CXXFLAGS: '-march=x86-64 -mtune=generic -O3 -pipe'
-      CPPFLAGS: '-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1 -DFD_SETSIZE=2048'
-      LDFLAGS: '-pipe'
+      CHOST: "x86_64-w64-mingw32"
+      CFLAGS: "-march=x86-64 -mtune=generic -O3 -pipe"
+      CXXFLAGS: "-march=x86-64 -mtune=generic -O3 -pipe"
+      CPPFLAGS: "-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1 -DFD_SETSIZE=2048"
+      LDFLAGS: "-pipe"
       GITPULLOPTIONS: --no-tags origin ${{ github.ref }}
 
     strategy:
@@ -49,10 +49,10 @@ jobs:
         include:
           # To mitigate flakiness of MinGW CI, we test only one runtime that newer MSYS2 uses.
           # Ruby 3.2 is the first Windows Ruby to use OpenSSL 3.x
-          - msystem: 'UCRT64'
-            baseruby: '3.2'
-            test_task: 'check'
-            test-all-opts: '--name=!/TestObjSpace#test_reachable_objects_during_iteration/'
+          - msystem: "UCRT64"
+            baseruby: "3.2"
+            test_task: "check"
+            test-all-opts: "--name=!/TestObjSpace#test_reachable_objects_during_iteration/"
       fail-fast: false
 
     if: >-
@@ -123,12 +123,11 @@ jobs:
         uses: ./.github/actions/launchable/setup
         with:
           os: windows-2022
-          # If we support new test task, we need to change this test-opts.
-          test-opts: --retry --job-status=normal --show-skip --timeout-scale=1.5
-            ${{ matrix.test-all-opts }}
           launchable-token: ${{ secrets.LAUNCHABLE_TOKEN }}
+          launchable-url: ${{ secrets.LAUNCHABLE_BASE_URL }}
           builddir: build
           srcdir: src
+          test-tasks: '["test", "test-all"]'
         continue-on-error: true
 
       - name: test
@@ -136,8 +135,8 @@ jobs:
         run: make test
         shell: cmd
         env:
-          GNUMAKEFLAGS: ''
-          RUBY_TESTOPTS: '-v --tty=no'
+          GNUMAKEFLAGS: ""
+          RUBY_TESTOPTS: "-v --tty=no"
         if: ${{ matrix.test_task == 'check' || matrix.test_task == 'test' }}
 
       - name: test-all
